@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm mới khách sạn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        [data-type="validator-error"] {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- form tạo mới hotel -->
+    <div class="container">
+        <br>
+        <h2>Thêm mới khách sạn</h2>
+        <div class="row">
+            <div class="col-6 offset-3">
+                <form id="add-hotel-form" onsubmit="return addRoom()">
+                    <div class="form-group">
+                        <label for="">Tên phòng</label>
+                        <input type="text" name="name" class="form-control" data-rule="required|minlength-4">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Avatar</label>
+                        <input type="text" name="avatar" class="form-control" data-rule="required|checkImgUrl">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Tầng</label>
+                        <input type="text" name="floor" class="form-control" data-rule="required">
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-sm btn-primary">Lưu</button>&nbsp;
+                        <a href="detai-hotel.html?hotelId=" class="btn btn-sm btn-danger">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="./js/js-form-validator.min.js"></script>
+    <script>
+        // var validator = new Validator(document.querySelector('#add-hotel-form'), function(err, res) {
+        //     if (res === true) {
+        //         addHotel();
+        //     }
+
+        //     return false;
+        // }, {
+        //     rules: {
+        //         checkImgUrl: function(value) {
+        //             return (/\.(gif|jpe?g|tiff|png|webp|bmp)$/i).test(value);
+        //         }
+        //     },
+        //     messages: {
+        //         en: {
+        //             required: {
+        //                 empty: 'Không được để trống',
+        //                 incorrect: 'Nhập sai thông tin'
+        //             },
+        //             minlength: {
+        //                 empty: 'Hãy nhập tối thiểu {0} ký tự',
+        //                 incorrect: 'Hãy nhập tối thiểu {0} ký tự'
+        //             },
+        //             checkImgUrl: {
+        //                 empty: 'Nhập đường dẫn ảnh',
+        //                 incorrect: 'Đường dẫn ảnh không đúng định dạng'
+        //             }
+        //         }
+        //     }
+        // });
+
+        // 1. lấy tham số id trên đường dẫn
+        const urlParams = new URLSearchParams(window.location.search);
+        id = urlParams.get('hotelId');  
+
+        function addRoom() {
+          
+            const name = document.querySelector('[name="name"]').value;
+            const avatar = document.querySelector('[name="avatar"]').value;
+            const floor = document.querySelector('[name="floor"]').value;
+            const requestObj = {
+                name: name,
+                avatar: avatar,
+                floor: floor
+            };
+            // gửi request lên mockapi để thêm khách sạn
+           
+            const apiUrl = 'https://5f2301e80e9f660016d88ba1.mockapi.io/hotels/' + id + "/rooms";
+            console.log(apiUrl);
+            axios.post(apiUrl, requestObj)
+                .then(data => {
+                    if (data.statusText === "Created") {
+                        Swal.fire({
+                                position: 'bottom-end',
+                                icon: 'success',
+                                title: 'Đã xóa',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                       setTimeout(() => window.location.href = 'detail-hotel.html?id=' +id, 1500);
+                    }
+                })
+                return false;
+                
+        }
+    </script>
+</body>
+
+</html>

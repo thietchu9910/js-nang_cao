@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm mới khách sạn</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body onload="getRoomInfor()">
+    <!-- form tạo mới hotel -->
+    <div class="container">
+        <br>
+        <h2>Cập nhật thông tin khách sạn</h2>
+        <div class="row">
+            <div class="col-6 offset-3">
+                <form onsubmit="return editRoom()">
+                    <label for="">Tên khách sạn</label>
+                    <select name="" class="form-control">
+                    </select>
+                    <div class="form-group">
+                        <label for="">Tên khách sạn</label>
+                        <input type="text" name="name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Ảnh logo</label>
+                        <input type="text" name="avatar" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Địa chỉ khách sạn</label>
+                        <input type="text" name="floor" class="form-control">
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-sm btn-primary">Lưu</button>&nbsp;
+                        <a href="detail-hotel.html?id=" id="cancel" class="btn btn-sm btn-danger">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <script>
+      let apiUrl = 'https://5f2301e80e9f660016d88ba1.mockapi.io/hotels/';
+      let roomInfo = "";
+      let getRoomInfoUrl = "";
+          // 1. lấy tham số id trên đường dẫn
+          var urlParams = window.location.search;
+            var reg = /\d+/g;
+            var id = urlParams.match(reg);
+            var roomId = id[0];
+            var hotelId = id[1];
+
+            var link = document.querySelector('#cancel').getAttribute('href');
+            link += hotelId;
+            document.querySelector('#cancel').setAttribute('href', link);
+            // 2. gửi request lên mock api để lấy thông tin của room về
+            getRoomInfoUrl = apiUrl + hotelId + "/rooms/" + roomId;
+
+        function getRoomInfor(){
+
+          
+
+             axios.get(apiUrl)
+                .then(re => {
+                    if (re.statusText === "OK") {
+                        document.querySelector('select').innerHTML = '';
+                        hotelInfo = re.data;
+
+                        var content = ``;
+                        hotelInfo.forEach(item => {
+                            content += `<option class="hotelName">${item.name}</option>`;
+                        });
+                        document.querySelector('select').innerHTML = content;
+                    }
+                })
+
+            axios.get(getRoomInfoUrl)
+            .then(res => {
+                if(res.statusText === "OK"){
+                     roomInfo = res.data;
+
+                    // 3. điền dữ liệu lấy đc từ api vào trong form
+                    document.querySelector('[name="name"]').value = roomInfo.name;
+                    document.querySelector('[name="avatar"]').value = roomInfo.avatar;
+                    document.querySelector('[name="floor"]').value = roomInfo.floor;
+                }
+            })
+            
+        }
+        
+        function editRoom(){
+            const name = document.querySelector('[name="name"]').value;
+            const avatar = document.querySelector('[name="avatar"]').value;
+            const floor = document.querySelector('[name="floor"]').value;
+            roomInfo.name = name;
+            roomInfo.avatar = avatar;
+            roomInfo.floor = floor;
+            console.log(floor);
+
+            // gửi request lên mockapi để thêm khách sạn
+            let updateRoomUrl = apiUrl + hotelId + "/rooms/" + roomId;
+            axios.put(updateRoomUrl, roomInfo)
+            .then(data => {    
+                Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Thêm mới thành công',
+                                showConfirmButton: false,
+                                timer: 1500
+                        });        
+                if(data.statusText === "OK"){                  
+                    setTimeout(() => window.location.href = 'detail-hotel.html?id=' + hotelId, 1500);
+                }
+            })
+            .catch(error => console.log(error));
+            return false;
+        }
+    </script>
+</body>
+</html>
